@@ -2,7 +2,7 @@
 Juego del ahorcado implementado con: sintaxis de agente, comandos de voz, estereotipos  y reconocimiento facial.
 
 Si tienes Windows revisa el siguiente vídeo para instalar face_recognition:
-https://www.youtube.com/watch?v=p1ypPeQSVcU&list=LL&index=4
+https://www.youtube.com/watch?v=p1ypPeQSVcU&t=1s
 
 Considera tener actualizado tanto Python como pip e instalar Anaconda.
 
