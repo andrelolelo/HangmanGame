@@ -29,37 +29,33 @@ MAX_DISTANCE = 0.6
 # Reconocimiento facial
 def get_face_embeddings_from_image(image, convert_to_rgb=False):
     
-    """
-     Tome una imagen sin procesar y ejecute tanto el modelo de detección de rostros como el de incrustación de rostros.
-    """
     # Conversión de imagen con formarto BGR a RGB 
     if convert_to_rgb:
         image = image[:, :, ::-1]
 
-    #Ejecuta el modelo de detección de rostros para encontrar ubicaciones de rostros
+    # Ejecuta el modelo de detección de rostros para encontrar ubicaciones de rostros
     face_locations = face_recognition.face_locations(image, model="hog")
 
-    # ejecute el modelo de incrustación para obtener incrustaciones faciales para las ubicaciones proporcionadas
+    # Ejecute el modelo de incrustación para obtener incrustaciones faciales para las ubicaciones proporcionadas
     face_encodings = face_recognition.face_encodings(image, face_locations)
 
     return face_locations, face_encodings
 
 
+# Carga las imágenes de referencia y crea una base de datos de sus codificaciones faciales
 def setup_database():
-    """
-    Cargue imágenes de referencia y cree una base de datos de sus codificaciones faciales
-    """
+ 
     database = {}
 
     for filename in glob.glob(os.path.join(images_path, '*.jpg')):
-        # cargar imagen
+        # Cargar imagen
         image_rgb = face_recognition.load_image_file(filename)
 
-        #Usa el nombre en el nombre del archivo como clave de identidad
+        # Usa el nombre del archivo como clave de identidad
         identity = os.path.splitext(os.path.basename(filename))[0]
         name = (identity)
 
-        #obtener la codificación de la cara y vincularla a la identidad
+        # Obtiene la codificación de la cara y la vincula a la identidad
         locations, encodings = get_face_embeddings_from_image(image_rgb)
         database[name] = encodings[0]
         
@@ -241,11 +237,13 @@ def mostrarTablero(figuraAhorcado, letrasIncorrectas, letrasCorrectas, palabraSe
  
     espaciosVacíos = '_' * len(palabraSecreta)
  
-    for i in range(len(palabraSecreta)): # completar los espacios vacíos con las letras adivinadas
+    # Completar los espacios vacíos con las letras adivinadas
+    for i in range(len(palabraSecreta)): 
         if palabraSecreta[i] in letrasCorrectas:
             espaciosVacíos = espaciosVacíos[:i] + palabraSecreta[i] + espaciosVacíos[i+1:]
  
-    for letra in espaciosVacíos: # mostrar la palabra secreta con espacios entre cada letra
+    # Mostrar la palabra secreta con espacios entre cada letra
+    for letra in espaciosVacíos: 
         print(letra, end=' ')
     print()
  
@@ -298,18 +296,31 @@ def jugarDeNuevo():
 
 def callAgent(valor):
     name = valor
-    #print(name)
-    e = TrivialVacuumEnvironment()
-    a = ReflexHangmanAgent(name)     #Clase agente, que implementan varias cosas que se definen en sub clases
-    TraceAgent(a)                   # es un observador que imprime los estados del agente
-    e.add_thing(a)                  # agrega una cosa al ambiente
-    a.setEnvironment(e)             #le indica al agente donde esta.
+    # Objeto de tipo Trivial
+    e = TrivialHangmanEnvironment()
+    
+    #Objeto agente "ReflexHangmanAgent"
+    a = ReflexHangmanAgent(name)     
+    
+    # Encargado de observar lo que hace el agente
+    TraceAgent(a)    
+        
+    # Se agrega al agente en el ambiente        
+    e.add_thing(a)       
+
+    # Se asigna que en donde está el ambiente se le asigna al agente, haciendo una relación      
+    a.setEnvironment(e)             
         
     k=1
     while (k<2):
-        percept = a.sense();                    # El agente detecta las cosas del ambiente
-        action = a.selectAction(percept);       # Ayuda a determinar el comportamiento del agente
-        e.execute_action(a,action);             # Le dice al ambiente que ejecute una acción
+        # El agente detecta las cosas del ambiente
+        percept = a.sense();          
+
+        # Determina el comportamiento del agente    
+        action = a.selectAction(percept);     
+        
+        # Indica al ambiente que se ejecute una acción
+        e.execute_action(a,action);             
         k += 1
 
 # Clase Thing
@@ -674,22 +685,19 @@ class Environment:
             self.agents.remove(thing)
 
 
-# TrivialEnvironment
+# TrivialHangmanEnvironment
 
 # Aquí se encuentra la implementación del ambiente, tomando como parámetro Environment
 # Describe el mundo en el que se establece el juego
 # Antes llamado GameController
 
-class TrivialVacuumEnvironment(Environment):
+class TrivialHangmanEnvironment(Environment):
 
     
     def __init__(self):
         super().__init__()
-        # Definición de estados
-        self.status = {loc_A: random.choice(['Clean', 'Dirty']),
-                       loc_B: random.choice(['Clean', 'Dirty']),
-                       loc_C: random.choice(['letra'])} #Se define el estado de C que es para hablar
-
+        # Definición de estado A
+        self.status = {loc_A: random.choice(['letra'])} 
 
     def thing_classes(self):
         return [ReflexHangmanAgent]
@@ -704,15 +712,15 @@ class TrivialVacuumEnvironment(Environment):
         """Change agent's location and/or location's status; track performance."""
         if action == 'letra':
             print("Accion decir Letra")
-            agent.location = loc_C 
+            agent.location = loc_A 
 
-    # Se establece el estado loc_C como por defecto
+    # Se establece el estado loc_A como por defecto
     def default_location(self, thing):
         """Agents start in either location at random."""
-        return random.choice([loc_C]) 
+        return random.choice([loc_A]) 
 
 # Definición de las locaciones donde estará el ambiente
-loc_A, loc_B, loc_C = 'A', 'B', 'C'  
+loc_A = 'A'  
 
 
 def vozAsistente(text):
